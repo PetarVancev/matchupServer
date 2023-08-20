@@ -4,6 +4,7 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
 
 const PORT = process.env.PORT || 3030;
 
@@ -15,16 +16,26 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: [""],
+    origin: ["*"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
 );
 app.use(cookieParser());
+
+const sessionStore = new MySQLStore({
+  host: "db4free.net",
+  port: "3306",
+  user: "petar12",
+  password: "0702002pm",
+  database: "matchup",
+});
+
 app.use(
   session({
     key: "userId",
     secret: "subscribe",
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
