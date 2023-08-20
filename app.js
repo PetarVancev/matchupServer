@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
+const PORT = process.env.PORT || 3030;
+
 // Hashing rounds for bcrypt
 const saltRound = 5;
 
@@ -13,7 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: [""],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -362,6 +364,6 @@ app.get("/listings/my/:id", (req, res) => {
   }
 });
 
-app.listen(3001, () => {
+app.listen(PORT, () => {
   console.log("Running server on port 3001");
 });
