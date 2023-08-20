@@ -31,6 +31,8 @@ const sessionStore = new MySQLStore({
   database: "matchup",
 });
 
+app.set("trust proxy", 1);
+
 app.use(
   session({
     key: "userId",
@@ -38,8 +40,10 @@ app.use(
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    name: "matchupLogin",
     cookie: {
-      expires: 60 * 60 * 24, // Cookie expiry in seconds
+      expires: 60 * 60 * 24,
+      sameSite: "none",
     },
   })
 );
