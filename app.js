@@ -43,8 +43,10 @@ app.use(
     name: "matchupLogin",
     cookie: {
       expires: 60 * 60 * 24,
-      sameSite: "none",
-      exposedHeaders: ["Set-Cookie"],
+      sameSite: "none", // Set the SameSite attribute to "None"
+      secure: true,
+      httpOnly: true,
+      domain: ".cyclic.cloud", 
     },
   })
 );
