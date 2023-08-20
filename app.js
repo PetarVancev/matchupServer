@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["*"],
+    origin: ["https://sparkling-parka-hare.cyclic.cloud"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
