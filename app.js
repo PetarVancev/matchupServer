@@ -43,6 +43,7 @@ app.use(
     cookie: {
       expires: 60 * 60 * 24,
       sameSite: "none",
+      exposedHeaders: ["Set-Cookie"],
     },
   })
 );
