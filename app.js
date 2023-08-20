@@ -13,13 +13,7 @@ const saltRound = 5;
 const app = express();
 
 app.use(express.json());
-app.use(
-  cors({
-    origin: ["https://sparkling-parka-hare.cyclic.cloud"],
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(cookieParser());
 app.use(
   session({
