@@ -26,8 +26,8 @@ app.use(cookieParser());
 const sessionStore = new MySQLStore({
   host: "db4free.net",
   port: "3306",
-  user: "petar12",
-  password: "0702002pm",
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
   database: "matchup",
 });
 
