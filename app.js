@@ -46,7 +46,7 @@ app.use(
       sameSite: "none", // Set the SameSite attribute to "None"
       secure: true,
       httpOnly: true,
-      domain: ".cyclic.cloud", 
+      domain: ".cyclic.cloud",
     },
   })
 );
@@ -384,43 +384,55 @@ app.get("/listings/my/:id", (req, res) => {
 
 app.post("/reviews/submit", (req, res) => {
   const { listingId, userId, rating, text } = req.body;
-
-  db.execute(
-    "INSERT INTO Review (listing_id, user_id, rating, text) VALUES (?, ?, ?, ?)",
-    [listingId, userId, rating, text],
-    (err, result) => {
-      if (err && err.code === "ER_DUP_ENTRY") {
-        console.log("Review already exists for this listing by the same user");
-        res.status(400).json({ message: "Review already exists" });
-      } else if (err) {
-        console.log("Error during review submission:", err);
-        res.status(500).json({ message: "Error during review submission" });
-      } else {
-        console.log("Review submitted successfully");
-        res.status(201).json({ message: "Review submitted successfully" });
+  if (req.session.user) {
+    db.execute(
+      "INSERT INTO Review (listing_id, user_id, rating, text) VALUES (?, ?, ?, ?)",
+      [listingId, userId, rating, text],
+      (err, result) => {
+        if (err && err.code === "ER_DUP_ENTRY") {
+          console.log(
+            "Review already exists for this listing by the same user"
+          );
+          res.status(400).json({ message: "Review already exists" });
+        } else if (err) {
+          console.log("Error during review submission:", err);
+          res.status(500).json({ message: "Error during review submission" });
+        } else {
+          console.log("Review submitted successfully");
+          res.status(201).json({ message: "Review submitted successfully" });
+        }
       }
-    }
-  );
+    );
+  } else {
+    console.log("Can't submit review because user is not loggedIn");
+    res.status(401).json({ loggedIn: false, message: "You are not logged in" });
+  }
 });
 
 app.get("/reviews/:userId", (req, res) => {
   const userId = req.params.userId;
-
-  db.execute(
-    `SELECT r.*
-    FROM Review r
-    JOIN Listing l ON r.listing_id = l.id
-    WHERE l.creator_id = ?;`,
-    [userId],
-    (err, result) => {
-      if (err) {
-        console.log("Error while fetching user reviews:", err);
-        res.status(500).json({ message: "Error while fetching user reviews" });
-      } else {
-        res.status(200).json(result);
+  if (req.session.user) {
+    db.execute(
+      `SELECT r.*
+      FROM Review r
+      JOIN Listing l ON r.listing_id = l.id
+      WHERE l.creator_id = ?;`,
+      [userId],
+      (err, result) => {
+        if (err) {
+          console.log("Error while fetching user reviews:", err);
+          res
+            .status(500)
+            .json({ message: "Error while fetching user reviews" });
+        } else {
+          res.status(200).json(result);
+        }
       }
-    }
-  );
+    );
+  } else {
+    console.log("Can't get reviews because user is not loggedIn");
+    res.status(401).json({ loggedIn: false, message: "You are not logged in" });
+  }
 });
 
 app.listen(PORT, () => {
