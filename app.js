@@ -379,6 +379,47 @@ app.get("/listings/my/:id", (req, res) => {
   }
 });
 
+app.post("/reviews/submit", (req, res) => {
+  const { listingId, userId, rating, text } = req.body;
+
+  db.execute(
+    "INSERT INTO Review (listing_id, user_id, rating, text) VALUES (?, ?, ?, ?)",
+    [listingId, userId, rating, text],
+    (err, result) => {
+      if (err && err.code === "ER_DUP_ENTRY") {
+        console.log("Review already exists for this listing by the same user");
+        res.status(400).json({ message: "Review already exists" });
+      } else if (err) {
+        console.log("Error during review submission:", err);
+        res.status(500).json({ message: "Error during review submission" });
+      } else {
+        console.log("Review submitted successfully");
+        res.status(201).json({ message: "Review submitted successfully" });
+      }
+    }
+  );
+});
+
+app.get("/reviews/:userId", (req, res) => {
+  const userId = req.params.userId;
+
+  db.execute(
+    `SELECT r.*
+    FROM Review r
+    JOIN Listing l ON r.listing_id = l.id
+    WHERE l.creator_id = ?;`,
+    [userId],
+    (err, result) => {
+      if (err) {
+        console.log("Error while fetching user reviews:", err);
+        res.status(500).json({ message: "Error while fetching user reviews" });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
 app.listen(PORT, () => {
   console.log("Running server on port 3001");
 });
